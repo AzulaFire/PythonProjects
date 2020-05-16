@@ -1,0 +1,193 @@
+#Tic-Tac-Toe Game
+
+#TL TM TR
+#ML MM MR
+#bottom-L bottom-M bottom-R
+
+from pprint import pprint
+import random #imports random package
+
+global playAgain #global var for game loop
+playAgain = True #game loop var set to true to run game
+
+while playAgain == True:
+
+#gameBoard dictionary
+    gameBoard = {
+        'TL':'_____|','TM':'_____','TR':'|_____',
+        'ML':'_____|','MM':'_____','MR':'|_____',
+        'BL':'     |','BM':'     ','BR':'|     '}
+#gameBoard dictionary clone but keys set to values for easy comparisons
+    gameBoardKeys = {
+        'TL':1,'TM':2,'TR':3,
+        'ML':4,'MM':5,'MR':6,
+        'BL':7,'BM':8,'BR':9}
+#sets the players to you and the CPU
+    players = {'Player':'','CPU':''}
+
+    move = ''
+    game = 0
+
+#function to print the game board
+    def setup():
+        print('\n\n')
+        print(gameBoard['TL'] + gameBoard['TM'] + gameBoard['TR'])
+        print(gameBoard['ML'] + gameBoard['MM'] + gameBoard['MR'])
+        print(gameBoard['BL'] + gameBoard['BM'] + gameBoard['BR'])
+        
+#function to update the gameBoard dictionary and delete key from clone so a position cannot be accessed twice
+    def updateBoard(position,player):
+        if position[0] == 'T':
+            if position[-1] == 'L':
+                gameBoard[position] = '__' + players[player] + '__|'
+                del gameBoardKeys['TL']
+            if position[-1] == 'M':
+                gameBoard[position] = '__' + players[player] + '__'
+                del gameBoardKeys['TM']
+            if position[-1] == 'R':
+                gameBoard[position] = '|__' + players[player] + '__'
+                del gameBoardKeys['TR']
+        if position[0] == 'M':
+            if position[-1] == 'L':
+                gameBoard[position] = '__' + players[player] + '__|'
+                del gameBoardKeys['ML']
+            if position[-1] == 'M':
+                gameBoard[position] = '__' + players[player] + '__'
+                del gameBoardKeys['MM']
+            if position[-1] == 'R':
+                gameBoard[position] = '|__' + players[player] + '__'
+                del gameBoardKeys['MR']
+        if position[0] == 'B':
+            if position[-1] == 'L':
+                gameBoard[position] = '  ' + players[player] + '  |'
+                del gameBoardKeys['BL']
+            if position[-1] == 'M':
+                gameBoard[position] = '  ' + players[player] + '  '
+                del gameBoardKeys['BM']
+            if position[-1] == 'R':
+                gameBoard[position] = '|  ' + players[player] + '  '
+                del gameBoardKeys['BR']
+
+#function to check if a 3 in a row, column or diagonal has been reached
+    def gameCheck():
+        #Horizontal Check
+        if gameBoard['TL'] + gameBoard['TM'] + gameBoard['TR'] == '__' + 'X' + '__|' + '__' + 'X' + '__' + '|__' + 'X' + '__':
+            return True
+        if gameBoard['TL'] + gameBoard['TM'] + gameBoard['TR'] == '__' + 'O' + '__|' + '__' + 'O' + '__' + '|__' + 'O' + '__':
+            return True
+        
+        if gameBoard['ML'] + gameBoard['MM'] + gameBoard['MR'] == '__' + 'X' + '__|' + '__' + 'X' + '__' + '|__' + 'X' + '__':
+            return True
+        if gameBoard['ML'] + gameBoard['MM'] + gameBoard['MR'] == '__' + 'O' + '__|' + '__' + 'O' + '__' + '|__' + 'O' + '__':
+            return True
+        
+        if gameBoard['BL'] + gameBoard['BM'] + gameBoard['BR'] == '  ' + 'X' + '  |' + '  ' + 'X' + '  ' + '|  ' + 'X' + '  ':
+            return True
+        if gameBoard['BL'] + gameBoard['BM'] + gameBoard['BR'] == '  ' + 'O' + '  |' + '  ' + 'O' + '  ' + '|  ' + 'O' + '  ':
+            return True
+
+        #Vertical Check
+        if gameBoard['TL'] + gameBoard['ML'] + gameBoard['BL'] == '__' + 'X' + '__|' + '__' + 'X' + '__|' + '  ' + 'X' + '  |':
+            return True
+        if gameBoard['TL'] + gameBoard['ML'] + gameBoard['BL'] == '__' + 'O' + '__|' + '__' + 'O' + '__|' + '  ' + 'O' + '  |':
+            return True
+        
+        if gameBoard['TM'] + gameBoard['MM'] + gameBoard['BM'] == '__' + 'X' + '__' +  '__' + 'X' + '__' + '  ' + 'X' + '  ':
+            return True
+        if gameBoard['TM'] + gameBoard['MM'] + gameBoard['BM'] == '__' + 'O' + '__' +  '__' + 'O' + '__' + '  ' + 'O' + '  ':
+            return True
+        
+        if gameBoard['TR'] + gameBoard['MR'] + gameBoard['BR'] == '|__' + 'X' + '__' +  '|__' + 'X' + '__' + '|  ' + 'X' + '  ':
+            return True
+        if gameBoard['TR'] + gameBoard['MR'] + gameBoard['BR'] == '|__' + 'O' + '__' +  '|__' + 'O' + '__' + '|  ' + 'O' + '  ':
+            return True
+
+        #Diagonal Check
+        if gameBoard['TL'] + gameBoard['MM'] + gameBoard['BR'] == '__' + 'X' + '__|' + '__' + 'X' + '__' + '|  ' + 'X' + '  ':
+            return True
+        if gameBoard['TL'] + gameBoard['MM'] + gameBoard['BR'] == '__' + 'O' + '__|' + '__' + 'O' + '__' + '|  ' + 'O' + '  ':
+            return True
+        
+        if gameBoard['TR'] + gameBoard['MM'] + gameBoard['BL'] == '|__' + 'X' + '__' +  '__' + 'X' + '__' +'  ' + 'X' + '  |':
+            return True
+        if gameBoard['TR'] + gameBoard['MM'] + gameBoard['BL'] == '|__' + 'O' + '__' +  '__' + 'O' + '__' +'  ' + 'O' + '  |':
+            return True
+
+#user validation to make sure right moves have been entered into the input
+    def playerCheck():
+        pCheck = False
+        global move
+        while pCheck == False:
+            print('''\nPlease choose a space.
+                     Top Row:Type in --> TL, TM, TR
+                     Middle Row:Type in --> ML, MM, MR
+                     Bottom Row:Type in --> BL, BM, BR''')
+            move = input('Type here: ').upper()
+            if move not in gameBoardKeys:
+                print("\nInvalid Move. Try Again.")
+            else:
+                pCheck = True
+        return move
+
+#function for the CPU to randomly choose from an open space. uses the gameBoardKeys dictionary to check what options are available
+    def cpu(cpuMove):
+        move = random.choice(list(gameBoardKeys.keys()))
+        updateBoard(move,player)
+
+#starts the game. user to choose to be either X or O with validation            
+    print('\nLet\'s play TIC-TAC-TOE!')
+
+    p1 = False
+    while p1 == False:
+        p1 = input('\nDo you want to be X or O? Please enter X or O and press the ENTER key to start.').upper()
+        if p1 == 'X':
+            players['CPU'] = 'O'
+            players['Player'] = 'X'
+            pl = True
+        elif p1 == 'O':
+            players['CPU'] = 'X'
+            players['Player'] = 'O'
+            p1 = True
+        else:
+            print('\nInvalid Entry. Please enter X or O and press the ENTER key to start.')
+            p1 = False
+
+#informs the player of their choice and what the CPU player will be
+    print('\nPlayer is: ' + players['Player'] + '\nCPU is: ' + players['CPU'])
+
+#coin flip to determine who gets first move
+    player = random.choice(list(players.keys()))
+    print('\n' + player + ' will be first to go.')
+
+    #Game Loop
+    while game < len(gameBoard): #up to 9 times
+        setup() #function to setup/print the board
+        if player == 'Player':
+            playerCheck()
+            updateBoard(move,player)
+            player = 'CPU'
+        else:
+            cpu(players['CPU'])
+            player = 'Player'
+        if gameCheck() == True:
+            setup()
+            break
+              
+        game += 1
+    if gameCheck() == True:
+        if player == 'CPU':
+            cpu(players['CPU'])
+            print('\nYou Win!')
+        else:
+            print('\nSorry. You Lose!')
+    else:
+        setup()
+        print('\nCat\'s Game. No Winners!')
+
+#play again check to continue the loop from the beginning or to quit
+    playAgain = input('\nPlay Again? (Y)es or (N)o: ').upper()
+    if playAgain[0] == 'Y':
+        playAgain = True
+    else:
+        playAgain = False
+
